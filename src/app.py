@@ -33,11 +33,3 @@ class Weather(db.Model):
 def get_temperature():
     response = requests.get("https://api.open-meteo.com/v1/forecast?latitude=49.2497&longitude=-123.1193&hourly=temperature_2m&current_weather=true")
     return response.json()["current_weather"]["temperature"]
-    
-def init_db():
-    with app.app_context():
-        db.create_all()
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db.session.remove()
