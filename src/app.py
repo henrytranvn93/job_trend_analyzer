@@ -56,16 +56,3 @@ def init_db_command():
     """Initializes the database tables."""
     init_db()
     print('Initialized the database.')
-
-if __name__ == "__main__":
-    init_db()
-    current_temperature = get_temperature()
-    if current_temperature is not None:
-        try:
-            new_entry = Weather(temperature=current_temperature)
-            db.session.add(new_entry)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print("Error:", e)
-    app.run(debug=True)
