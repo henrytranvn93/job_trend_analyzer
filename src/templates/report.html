@@ -1,0 +1,4 @@
+<h2>Job Listings</h2>
+{% for job in jobs %}
+    <p>Title: {{ job.title }}, Company: {{ job.company }}, Location: {{ job.location }}</p>
+{% endfor %}

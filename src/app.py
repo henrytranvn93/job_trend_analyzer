@@ -1,35 +1,41 @@
-#!/usr/bin/env python3
+from flask import Flask, render_template, request
 import requests
-from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Weather.sqlite3'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jobs.db'
 db = SQLAlchemy(app)
 
-@app.route("/")
-def main():
-    return '''
-     <form action="/echo_user_input" method="POST">
-        <p>Input your name and submit to see the greeting!</p>
-         <input name="user_input">
-         <input type="submit" value="Submit!">
-     </form>
-     '''
+# Database Model
+class Job(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    company = db.Column(db.String(80), nullable=False)
+    location = db.Column(db.String(80), nullable=False)
 
-@app.route("/echo_user_input", methods=["POST"])
-def echo_input():
-    input_text = request.form.get("user_input", "")
-    current_temperature = get_temperature()
-    return f"Hello {input_text}! Nice to meet you. Temperature at Vancouver now: {current_temperature} Celcius."
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        keyword = request.form['keyword']
+        jobs = fetch_jobs(keyword)
+        return render_template('report.html', jobs=jobs)
+    return render_template('index.html')
 
-class Weather(db.Model):
-    datetime = db.Column(db.DateTime, primary_key=True, default=datetime.utcnow())
-    temperature = db.Column(db.Float, nullable=False)
+def fetch_jobs(keyword):
+    # Placeholder for an API call
+    job_data = [{'title': 'Software Engineer', 'company': 'Tech Corp', 'location': 'NYC'}]
+    for job in job_data:
+        new_job = Job(title=job['title'], company=job['company'], location=job['location'])
+        db.session.add(new_job)
+    db.session.commit()
+    return job_data
 
+@app.cli.command('initdb')
+def initdb_command():
+    """Creates the database tables."""
+    db.create_all()
+    print('Initialized the database.')
 
-def get_temperature():
-    response = requests.get("https://api.open-meteo.com/v1/forecast?latitude=49.2497&longitude=-123.1193&hourly=temperature_2m&current_weather=true")
-    return response.json()["current_weather"]["temperature"]
+if __name__ == '__main__':
+    db.create_all()  # Create the database tables
+    app.run(debug=True)
