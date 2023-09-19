@@ -33,9 +33,12 @@ def fetch_jobs(keyword):
 @app.cli.command('initdb')
 def initdb_command():
     """Creates the database tables."""
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     print('Initialized the database.')
 
 if __name__ == '__main__':
-    db.create_all()  # Create the database tables
-    app.run(debug=True)
+    if "initdb" in sys.argv:
+        init_db()
+    else:
+        app.run(debug=True)
