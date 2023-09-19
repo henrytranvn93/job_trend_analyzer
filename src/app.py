@@ -2,9 +2,14 @@ from flask import Flask, render_template, request
 import requests
 import sys
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jobs.db'
+
+# Adjusting the DATABASE_URL for SQLAlchemy compatibility
+DATABASE_URL = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql://")
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+
 db = SQLAlchemy(app)
 
 # Database Model
