@@ -38,6 +38,10 @@ def initdb_command():
         db.create_all()
     print('Initialized the database.')
 
+def init_db():
+    with app.app_context():
+        db.create_all()
+
 if __name__ == '__main__':
     if "initdb" in sys.argv:
         init_db()
